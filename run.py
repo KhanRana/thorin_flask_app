@@ -1,8 +1,11 @@
 import os
 import json
-from flask import Flask, render_template, url_for
+from flask import Flask, render_template, url_for, request, flash
+if os.path.exists("env.py"):
+    import env
 
 app = Flask(__name__)
+app.secret_key = os.environ.get("SECRET_KEY")
 
 
 @app.route('/')
@@ -18,9 +21,20 @@ def about():
     return render_template("about.html", company=data)
 
 
+@app.route('/about/<member_name>')
+def about_member(member_name):
+    member = {}
+    with open("data/company.json", 'r') as json_data:
+        data = json.load(json_data)
+        for obj in data:
+            if obj["url"] == member_name:
+                member = obj
+    return render_template("member.html", member=member)
+
+
 @app.route('/contact')
 def contact():
-    return render_template("contact.html")
+    return render_template("contact.html", title="Contact")
 
 
 @app.route('/careers')
